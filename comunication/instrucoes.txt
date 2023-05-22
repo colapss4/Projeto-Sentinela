@@ -1,0 +1,6 @@
+#python -m venv "nome da pasta(.venv)" - cria o python local
+#source .venv/Scripts/activate - Ativa o python local
+#deactivate - sair do venv
+
+#pip freeze > "nome do arquivo criado" - compacta todas as bibliotecas necessarias
+#pip3 install -r requirement.txt  - instala as dependencias necessarias
