@@ -14,7 +14,7 @@ while True:
         # Verificar se o sinal do Arduino foi recebido
         if dado == '1':
             # Executar o script Python
-            subprocess.call(['python', 'C:\\Users\\brendo.arenas\\Desktop\\projeto\\Projeto-Sentinela\\comunication\\arduino.pyw'])  # Altere para o caminho do seu script Python
+            subprocess.call(['C:\\Users\\brendo.arenas\\Desktop\\projeto\\Projeto-Sentinela\\comunication\\interface.exe'])  # Altere para o caminho do seu script Python
 
     # Adicionar um pequeno atraso para não consumir muito processamento
     time.sleep(0.1)
