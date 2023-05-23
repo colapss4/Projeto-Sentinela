@@ -1,25 +1,56 @@
-const int pinoChave = 7; // PINO DIGITAL UTILIZADO PELA CHAVE FIM DE CURSO
+const int numFinsDeCurso = 4; // Número total de fins de curso
+const int pinoChaves[numFinsDeCurso] = {7, 8, 9, 10}; // PINOS DIGITAIS UTILIZADOS PELOS FINS DE CURSO
 const int pinoLed = 12; // PINO DIGITAL UTILIZADO PELO LED
-bool fimDeCursoAtivado = false; // Variável para controlar o estado do fim de curso
+
+bool finsDeCursoAtivados[numFinsDeCurso] = {false}; // Estado dos fins de curso
+unsigned long tempoInicial = 0;
+bool primeiroFimDeCursoAtivado = false;
 
 void setup() {
-  pinMode(pinoChave, INPUT_PULLUP); // DEFINE O PINO COMO ENTRADA / "_PULLUP" É PARA ATIVAR O RESISTOR INTERNO
-  pinMode(pinoLed, OUTPUT); // DEFINE O PINO COMO SAÍDA
-  digitalWrite(pinoLed, LOW); // LED INICIA DESLIGADO
-
+  for (int i = 0; i < numFinsDeCurso; i++) {
+    pinMode(pinoChaves[i], INPUT_PULLUP); // Configura os pinos dos fins de curso como entrada com resistor pull-up
+  }
+  
+  pinMode(pinoLed, OUTPUT); // Configura o pino do LED como saída
+  digitalWrite(pinoLed, LOW); // Inicialmente, o LED está desligado
+  
   Serial.begin(9600); // Inicializa a comunicação serial
 }
 
 void loop() {
-  if (digitalRead(pinoChave) == LOW && !fimDeCursoAtivado) { // SE A LEITURA DO PINO FOR IGUAL A LOW E fimDeCursoAtivado for false, FAZ
-    fimDeCursoAtivado = true; // Define fimDeCursoAtivado como true
-    digitalWrite(pinoLed, HIGH); // ACENDE O LED
-    
-  } else if (digitalRead(pinoChave) == HIGH && fimDeCursoAtivado) { // SENÃO SE A LEITURA DO PINO FOR IGUAL A HIGH E fimDeCursoAtivado for true, FAZ
-    fimDeCursoAtivado = false; // Define fimDeCursoAtivado como false
-    digitalWrite(pinoLed, LOW); // APAGA O LED
-    
-    // Envia um caractere '1' pela comunicação serial para o PC indicando que o fim de curso foi desativado
-    Serial.write('1');
+  // Verificar o estado dos fins de curso
+  bool algumFimDeCursoAtivado = false;
+
+  for (int i = 0; i < numFinsDeCurso; i++) {
+    if (digitalRead(pinoChaves[i]) == LOW) { // Verifica se o fim de curso está ativado
+      finsDeCursoAtivados[i] = true; // Marca o fim de curso como ativado
+      algumFimDeCursoAtivado = true; // Define a flag para indicar que pelo menos um fim de curso foi ativado
+    }
+  }
+
+  // Aguardar 5 segundos após o acionamento do primeiro fim de curso ativado
+  if (!primeiroFimDeCursoAtivado && algumFimDeCursoAtivado) {
+    tempoInicial = millis(); // Armazena o tempo inicial
+    primeiroFimDeCursoAtivado = true; // Define a flag para indicar que o primeiro fim de curso foi ativado
+  }
+
+  // Verificar se todos os fins de curso foram ativados dentro do período de 5 segundos
+  if (primeiroFimDeCursoAtivado && (millis() - tempoInicial) >= 5000) {
+    bool todosAtivados = true;
+
+    for (int i = 0; i < numFinsDeCurso; i++) {
+      if (!finsDeCursoAtivados[i]) { // Verifica se algum fim de curso não foi ativado
+        todosAtivados = false; // Define a flag para indicar que nem todos os fins de curso foram ativados
+        break;
+      }
+    }
+
+    if (todosAtivados) {
+      digitalWrite(pinoLed, HIGH); // Liga o LED se todos os fins de curso foram ativados
+    } else {
+      Serial.write('1'); // Enviar o sinal para o computador indicando que os fins de curso não foram ativados dentro do tempo limite
+    }
+  } else {
+    digitalWrite(pinoLed, LOW); // Desliga o LED
   }
 }
