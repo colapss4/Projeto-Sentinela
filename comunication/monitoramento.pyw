@@ -1,6 +1,10 @@
 import serial
-import subprocess
+import PySimpleGUI as sg
 import time
+
+
+# Defini o tema da interface gráfica
+sg.theme('dark grey 9')
 
 # Configurar a porta serial
 porta_serial = serial.Serial('COM3', 9600)  # Altere para a porta serial correta
@@ -13,8 +17,8 @@ while True:
 
         # Verificar se o sinal do Arduino foi recebido
         if dado == '1':
-            # Executar o script Python
-            subprocess.call(['C:\\Users\\brendo.arenas\\Desktop\\projeto\\Projeto-Sentinela\\comunication\\interface.exe'])  # Altere para o caminho do seu script Python
+            # Exibir o popup
+            sg.popup('Sua Postura Está Incorreta')   
 
     # Adicionar um pequeno atraso para não consumir muito processamento
     time.sleep(0.1)
